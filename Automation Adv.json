@@ -1,0 +1,954 @@
+{
+  "name": "Automation Adv",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2864,
+        -832
+      ],
+      "id": "0f82ca5c-2360-477a-93e5-b417a4724ac6",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REMOVIDO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2864,
+        -1008
+      ],
+      "id": "c4d08248-ef3f-45b1-9465-29e7580b231e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REMOVIDO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n",
+        "height": 720,
+        "width": 1584,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2944,
+        -1216
+      ],
+      "typeVersion": 1,
+      "id": "8912dc28-d3dc-48f3-90f4-4c0cd84f2ff1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').item.json.numero }}",
+        "sessionTTL": 3600,
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -2864,
+        -1168
+      ],
+      "id": "a36e32c6-fe90-4b00-8dab-7a5190afe4a5",
+      "name": "Redis Chat Memory1",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Mensage').item.json.menssagem }}",
+        "options": {
+          "systemMessage": "=Você é o assistente de triagem da Advocacia Pereira, especializada em direitos de pessoas com deficiência. Seu nome é Roberto.\n\nOBJETIVO: Coletar Nome e Situação do cliente de forma empática e eficiente.\n\nFLUXO OBRIGATÓRIO:\n1. Cumprimente e apresente a Advocacia Pereira\n2. Solicite o Nome Completo\n3. Solicite uma Breve Descrição da Situação\n4. Confirme: \"Posso confirmar seu nome e está situação no sistema?\"\n\nREGRAS:\n- Pergunte UMA informação por vez\n- Aguarde a resposta antes de prosseguir\n- Seja empático, claro e objetivo\n- NÃO forneça aconselhamento jurídico\n- Não use asteriscos ou topico, tente ser mais humano e fluido possivel.\n\nConsidere que a data atual é: {{ $json.hojeISO }} \n(dia {{ $json.dia }}/{{ $json.mes }}/{{ $json.ano }}). \nUse essa informação para qualquer raciocínio temporal.\n\nSAÍDA FINAL:\nQuando o cliente responder \"sim\", \"confirmo\" ou similar à confirmação final, retorne APENAS:\n{\"Nome\":\"[nome]\",\"Situacao\":\"[situacao]\"}\n\nSe o cliente não confirmar, continue a conversa normalmente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        -400
+      ],
+      "id": "840b094a-b547-4ac4-9be4-a53cda12a740",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "REMOVIDO",
+          "mode": "list",
+          "cachedResultName": "Advocacia",
+          "cachedResultUrl": "REMOVIDO"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "REMOVIDO"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        -96
+      ],
+      "id": "13274c53-c52f-4816-9130-99c7ba549f88",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "REMOVIDO",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "get",
+        "documentURL": "REMOVIDO"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -64
+      ],
+      "id": "87ad01ba-c167-410e-87fd-e80e33773dae",
+      "name": "Get a document in Google Docs1",
+      "credentials": {
+        "googleApi": {
+          "id": "REMOVIDO",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea49a3e3-a790-4c5a-b293-88ddc9710452",
+              "name": "numero",
+              "value": "={{ $json.body.message.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "753dd596-2518-40ef-82f8-3bfc1070fd7f",
+              "name": "type",
+              "value": "={{ $json.body.message.messageType }}",
+              "type": "string"
+            },
+            {
+              "id": "21c03863-6106-4f1f-990f-c1ff38f46d5e",
+              "name": "menssagem",
+              "value": "={{ $json.body.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8afb3278-db54-419c-9551-225a25ebd450",
+              "name": "id",
+              "value": "={{ $json.body.message.messageid }}",
+              "type": "string"
+            },
+            {
+              "id": "49d2cd20-18ac-42d1-8102-479cc483f182",
+              "name": "groqkey",
+              "value": "REMOVIDO",
+              "type": "string"
+            },
+            {
+              "id": "7c54e1c7-3ded-43e1-b846-ec564c6e4a32",
+              "name": "token",
+              "value": "REMOVIDO",
+              "type": "string"
+            },
+            {
+              "id": "6552609a-5d91-4093-9048-474678d88bca",
+              "name": "url",
+              "value": "={{ $json.body.BaseUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3504,
+        240
+      ],
+      "id": "a484c77e-925f-4280-a645-bf7cdff706a2",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "get",
+        "documentURL": "REMOVIDO"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        1184
+      ],
+      "id": "b1da8c30-4fe7-4792-b909-5b222f03f1b4",
+      "name": "Get a document in Google Docs",
+      "credentials": {
+        "googleApi": {
+          "id": "REMOVIDO",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -160
+      ],
+      "id": "7c763849-9c15-412f-b323-bc5f790c0479",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "REMOVIDO",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.numero }}",
+        "value": "triagem"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        1088
+      ],
+      "id": "d187774a-25a6-49ac-8c0e-c62d35b466cd",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Mensage').item.json.menssagem }}",
+        "options": {
+          "systemMessage": "=Você é o consultor jurídico da Advocacia Pereira. O cliente já passou pela triagem inicial.\n\nEssa é a situação do individuo para iniciar:\n{{ $json.menssagem }}\n\nOBJETIVO:\nColetar informações detalhadas para qualificar o caso.\n\nFLUXO DE PERGUNTAS:\n\nPergunte: “Você tem interesse em qual assunto?” \n(Caso não seja indentifido.)\n\nOpção A: Aposentadoria do PCD\n\nOpção B: Auxílio-acidente\n\nSE Auxílio-acidente:\na) Pergunte: “Em qual ano ocorreu o acidente?”\nb) Pergunte: “Você teve perícia que lhe deu alta e negou a prorrogação do benefício?”\nc) Pergunte: “Você ainda tem sequelas do acidente até hoje?”\nd) Após as respostas, ofereça agendar uma ligação ou reunião para análise do caso.\n\nSE Aposentadoria do PCD:\na) Pergunte: “Qual sua idade atual?”\nb) Pergunte: “Quantos anos de contribuição você tem?”\nc) Pergunte: “Você busca aposentadoria comum ou aposentadoria do PCD?”, explicando a diferença de forma simples se necessário.\nd) Pergunte: “Qual sua deficiência e desde quando você a tem?”\n(Se escolher PCD)\ne) Pergunte: “Você poderia nos enviar o CNIS para fazermos a simulação?”\nf) Após as respostas, ofereça agendar uma ligação ou reunião para análise do caso.\n\nAgendamento:\nApós o questionário, tente realizar o agendamento de uma reunião presencial ou ligação, respeitando obrigatoriamente duas etapas. Primeiro, proponha uma data, preferencialmente 7 dias posteriores à data atual, e pergunte se esse dia é adequado para o cliente. Somente após a concordância com o dia, pergunte qual horário é mais conveniente. Apenas depois da confirmação clara do horário com respostas como “sim”, “confirmo” ou similares, finalize o agendamento. Após a confirmação final da reunião ou ligação, retorne APENAS:\n{\"Dia\":\"[dia]\",\"Horario\":\"[horario]\",\"Mes\":\"[mes]\"}\n\nCASO O CLIENTE NÃO DESEJE PROSSEGUIR:\nSeja compreensivo, agradeça o contato de forma educada e encerre o atendimento sem insistência.\n\nREGRAS:\n\nSeja empático e profissional\n\nPergunte uma coisa por vez\n\nUse linguagem clara e acessível\n\nExplique termos técnicos quando necessário\n\nNão use asteriscos ou tópicos, mantenha um tom humano e fluido\n\nNunca faça duas perguntas exatamente iguais uma após a outra\n\nCaso seja necessário repetir uma pergunta por falta ou incompletude da resposta, reformule a pergunta com um tom educado, utilizando expressões como “Desculpe repetir, mas poderia me informar…” ou “Peço desculpas por perguntar novamente, é apenas para confirmar…”\n\nFERRAMENTAS DISPONÍVEIS:\n\nGoogle Sheets: Consultar dados do cliente\n\nGoogle Docs: Acessar informações sobre procedimentos\n\nConsidere que a data atual é: {{ $('Horario 2').item.json.metaTempo.hojeISO }} (dia {{ $('Horario 2').item.json.metaTempo.dia }}/{{ $('Horario 2').item.json.metaTempo.mes }}/{{ $('Horario 2').item.json.metaTempo.ano }}). Use essa informação para qualquer raciocínio temporal.\n\nUse as ferramentas sempre que precisar consultar informações do cliente ou procedimentos internos.\n\nUSE A LINGUA PORTUGUES."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        928
+      ],
+      "id": "301e826d-ba38-4b18-b464-8d614318a663",
+      "name": "AI Agent1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ef992ef-bb94-4bf2-8e30-763e0297de08",
+              "leftValue": "={{ $('AI Agent').item.json.output }}",
+              "rightValue": "{\"Nome\":",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -416
+      ],
+      "id": "a2d985cc-57de-4df1-a3a0-d71d36a34ad0",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Dados').item.json.instacia }}",
+        "remoteJid": "={{ $('Dados').item.json.numero }}",
+        "messageId": "={{ $('Dados').item.json.id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -2464,
+        -1184
+      ],
+      "id": "cb8b5e41-9590-4feb-b19f-ba359ac322e3",
+      "name": "Marcar mensagens como lidas2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "REMOVIDO",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').item.json.instacia }}",
+        "remoteJid": "={{ $('Dados').item.json.numero }}",
+        "messageText": "={{ $('AI Agent').item.json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -2464,
+        -1008
+      ],
+      "id": "21abbbd0-058d-4462-8aed-636f3d9b60be",
+      "name": "Enviar texto2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "REMOVIDO",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.numero }}",
+        "value": "inicio"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -560
+      ],
+      "id": "f0e7dc87-9f7c-41b3-9584-b30afb6ed874",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REMOVIDO",
+          "mode": "list",
+          "cachedResultName": "Advocacia",
+          "cachedResultUrl": "REMOVIDO"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1792089394,
+          "mode": "list",
+          "cachedResultName": "Página2",
+          "cachedResultUrl": "REMOVIDO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Dia": "={{ $('Code in JavaScript5').item.json.Dia }}",
+            "Horario": "={{ $('Code in JavaScript5').item.json.Horario }}",
+            "Mês ": "={{ $('Code in JavaScript5').item.json.Mes }}"
+          },
+          "matchingColumns": [
+            "Nome"
+          ],
+          "schema": [
+            {
+              "id": "Dia",
+              "displayName": "Dia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horario",
+              "displayName": "Horario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mês ",
+              "displayName": "Mês ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        800
+      ],
+      "id": "ea3f942b-fcff-436f-af10-89dc95056b70",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "REMOVIDO",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ef992ef-bb94-4bf2-8e30-763e0297de08",
+              "leftValue": "={{ $('AI Agent1').item.json.output }}",
+              "rightValue": "{\"Dia\"",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        912
+      ],
+      "id": "b2b4bcf4-7db8-4ad1-9374-218e51e6fe4c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.numero }}",
+        "value": "triagem"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        800
+      ],
+      "id": "6dbb2b7d-ac44-4ccf-af23-2e418afeb1a7",
+      "name": "Redis2",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer {{ $('Dados').item.json.groqkey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-large-v3-turbo"
+            },
+            {
+              "name": "temperature",
+              "value": "0"
+            },
+            {
+              "name": "response_format",
+              "value": "verbose_json"
+            },
+            {
+              "name": "language",
+              "value": "pt"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2704,
+        592
+      ],
+      "id": "78761f30-db74-484d-af4c-e03fe786b9c2",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e9d2113-db5e-43b4-bf68-d026e6fbd1f6",
+              "name": "menssgem",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        560
+      ],
+      "id": "c966c6a7-bf86-4ff6-8d0b-91f328e4d8be",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Descreva a imagem enviada detalhadamente.",
+        "inputType": "binary",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2560,
+        368
+      ],
+      "id": "6bc7c0cf-0169-41e2-a602-aaed8681777c",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REMOVIDO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook').item.json.body.data.message.imageMessage.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "file",
+              "outputPropertyName": "image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2688,
+        -1184
+      ],
+      "id": "a5b2a019-9e64-42a6-945e-093ccd9a681f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer {{ $('Dados').item.json.groqkey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "model"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "temperature"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "response_format"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "language"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "image.jpeg"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2688,
+        -1008
+      ],
+      "id": "b440966c-f0dd-4338-8f2c-649a91fac59a",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "=customKey",
+        "sessionKey": "=memoria:{{ $('Dados').item.json.numero }}",
+        "sessionTTL": 3600,
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "7f188375-92e9-4982-93d5-dde38f9cbe53",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\n\n// Lista de possíveis campos onde o JID pode aparecer\nconst candidates = [\n  body?.data?.key?.remoteJid,\n  body?.data?.key?.sender,\n  body?.data?.key?.senderLid,\n  body?.from\n];\n\n// Número que deve ser ignorado\nconst MEU_NUMERO = 'REMOVIDO';\n\n// Procura o primeiro JID válido\nconst raw = candidates.find(v => {\n  if (typeof v !== 'string') return false;\n  if (!v.endsWith('@s.whatsapp.net')) return false;\n\n  const numeroLimpo = v.replace('@s.whatsapp.net', '');\n  if (numeroLimpo === MEU_NUMERO) return false;\n\n  return true;\n});\n\nif (!raw) {\n  return [];\n}\n\nconst numero = raw.replace('@s.whatsapp.net', '');\n\nreturn [\n  {\n    json: {\n      ...$json,\n      Numero: numero\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2464,
+        -816
+      ],
+      "id": "d49dade3-b0d3-4c10-a4d3-0997bc36cffb",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        1184
+      ],
+      "id": "7565eda0-b599-4904-8275-ae80398f2de8",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "REMOVIDO",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "=customKey",
+        "sessionKey": "=memoria: {{ $json.Numero }}",
+        "sessionTTL": 3600,
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -368,
+        1184
+      ],
+      "id": "aade9d12-b563-45d7-9d12-f6353dd3bc61",
+      "name": "Redis Chat Memory3",
+      "credentials": {
+        "redis": {
+          "id": "REMOVIDO",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const agentResponse = $('AI Agent1').first().json.output;\n\nlet parsedData;\n\ntry {\n  parsedData = JSON.parse(agentResponse);\n} catch {\n  return [];\n}\n\nconst now = new Date();\n\nparsedData.dia = now.getDate();\nparsedData.mes = now.getMonth() + 1;\nparsedData.horario = now.toLocaleTimeString('pt-BR', {\n  hour: '2-digit',\n  minute: '2-digit'\n});\n\nreturn [{ json: parsedData }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        800
+      ],
+      "id": "7a530ce6-9d3f-42cc-a74b-4bcdee6e2bd3",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e9d2113-db5e-43b4-bf68-d026e6fbd1f6",
+              "name": "menssagem",
+              "value": "={{ $json.menssgem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        512
+      ],
+      "id": "8eb94f55-e462-4d2f-83b1-85c1669bdad3",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3808,
+        240
+      ],
+      "id": "88d16cc0-d3cd-4362-a442-a39fb52117fa",
+      "name": "Webhook",
+      "webhookId": "REMOVIDO",
+      "retryOnFail": false,
+      "waitBetweenTries": 500
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Dados').item.json.url }}/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $('Dados').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Dados').item.json.numero }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('AI Agent').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        -560
+      ],
+      "id": "75915ea2-959d-45c6-bd59-1de5a274a986",
+      "name": "Uazapi Send Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Dados').item.json.url }}/message/markread",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $('Dados').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"id\": [\"REMOVIDO\", \"REMOVIDO\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        -544
+      ],
+      "id": "f01ab39a-a486-4027-8335-dac0db5a327c",
+      "name": "Uazapi View Mensage"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Dados').item.json.url }}/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "REMOVIDO"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.numero }}"
+            },
+            {
+              "name": "text",
+              "value": "Desculpe, nosso sistema falhou, poderia enviar uma mensagem de texto?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1296,
+        1264
+      ],
+      "id": "71b21224-f394-433b-ae77-80821bbd2025",
+      "name": "Mensagem Scap"
+    }
+  ]
+}
